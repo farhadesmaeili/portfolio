@@ -1,0 +1,105 @@
+@import 'tailwindcss';
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #e2e8f0;
+  --accent: #00ff41;
+  --accent-glow: rgba(0, 255, 65, 0.15);
+  --surface: #111111;
+  --surface-raised: #161616;
+  --border: #1f1f1f;
+  --muted: #64748b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-glow: var(--accent-glow);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--accent) 80%, white);
+}
+
+/* Glitch + neon glow on hero name */
+@keyframes glitch {
+  0%,
+  92%,
+  100% {
+    text-shadow:
+      0 0 20px rgba(0, 255, 65, 0.35),
+      0 0 40px rgba(0, 255, 65, 0.12);
+    transform: none;
+  }
+  93% {
+    text-shadow:
+      -3px 0 rgba(0, 212, 255, 0.85),
+      3px 0 rgba(255, 0, 64, 0.85),
+      0 0 20px rgba(0, 255, 65, 0.35);
+    transform: skew(-0.4deg);
+  }
+  95% {
+    text-shadow:
+      3px 0 rgba(0, 212, 255, 0.85),
+      -3px 0 rgba(255, 0, 64, 0.85),
+      0 0 20px rgba(0, 255, 65, 0.35);
+    transform: skew(0.4deg);
+  }
+  97% {
+    text-shadow:
+      -1px 0 rgba(0, 212, 255, 0.5),
+      1px 0 rgba(255, 0, 64, 0.5),
+      0 0 20px rgba(0, 255, 65, 0.35);
+    transform: none;
+  }
+}
+
+.name-glow {
+  text-shadow:
+    0 0 20px rgba(0, 255, 65, 0.35),
+    0 0 40px rgba(0, 255, 65, 0.12);
+  animation: glitch 5s ease-in-out infinite;
+}
