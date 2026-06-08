@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Add default labels based on issue type
-        uses: actions/github-script@v6
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -62,7 +62,7 @@ jobs:
             }
 
       - name: Comment with workflow guidance
-        uses: actions/github-script@v6
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
