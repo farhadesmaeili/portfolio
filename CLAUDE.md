@@ -1,28 +1,34 @@
-# CLAUDE.md — Personal Portfolio
+# CLAUDE.md — Farhad Esmaeili Portfolio
 
 > این فایل راهنمای کامل پروژه است.
-> هر بار که با Claude کار می‌کنی، این فایل را اول بخوان.
+> اول این فایل رو کامل بخوان، بعد شروع به کد نوشتن کن.
+
+---
+
+## 👤 درباره صاحب پروژه
+
+- **نام**: Farhad Esmaeili — فرهاد اسماعیلی
+- **حوزه کاری**: Full Stack Developer + Bug Bounty Hunter
+- **تکنولوژی‌ها**:
+  - Frontend: Next.js, React, Flutter, Dart, HTML, CSS, Sass, Tailwind
+  - Backend: NestJS, Python, WordPress
+  - DevOps: Docker, Kubernetes, Linux
+  - Other: Git, GitHub, Bug Bounty
 
 ---
 
 ## 📌 وضعیت پروژه
 
-| بخش                                       | وضعیت                  |
-| ----------------------------------------- | ---------------------- |
-| Next.js 15 + TypeScript + Tailwind CSS v4 | ✅ نصب شده             |
-| Husky + commitlint + lint-staged          | ✅ راه‌اندازی شده      |
-| Prettier + prettier-plugin-tailwindcss    | ✅ نصب شده             |
-| GitHub Actions — CI (Lint + Type Check)   | ✅ فعال و سبز          |
-| GitHub Actions — Deploy (Vercel)          | ✅ فعال و سبز          |
-| GitHub Actions — Issue Sync               | ✅ فعال                |
-| Vercel                                    | ✅ متصل و آنلاین       |
-| Issue Templates (bug, feature, task)      | ✅ ساخته شده           |
-| PR Template                               | ✅ ساخته شده           |
-| Dependabot                                | ✅ فعال                |
-| Branch Protection (main + develop)        | ✅ تنظیم شده           |
-| Branch develop                            | ✅ ساخته شده و default |
-| ساختار پوشه‌های src/                      | ⏳ در انتظار           |
-| کدنویسی پروژه                             | ⏳ در انتظار           |
+| بخش                                       | وضعیت             |
+| ----------------------------------------- | ----------------- |
+| Next.js 15 + TypeScript + Tailwind CSS v4 | ✅ نصب شده        |
+| Husky + commitlint + lint-staged          | ✅ راه‌اندازی شده |
+| Prettier + prettier-plugin-tailwindcss    | ✅ نصب شده        |
+| GitHub Actions CI + Deploy                | ✅ فعال           |
+| Vercel                                    | ✅ متصل و آنلاین  |
+| Branch Protection (main + develop)        | ✅ تنظیم شده      |
+| ساختار پوشه‌های src/                      | ⏳ در انتظار      |
+| کدنویسی پروژه                             | ⏳ در انتظار      |
 
 ---
 
@@ -34,7 +40,28 @@
 - **Node Version**: `>=20.x`
 - **Hosting**: Vercel
 - **Repo**: https://github.com/farhadesmaeili/portfolio
-- **Vercel Dashboard**: https://vercel.com/farhadesmaeilis-projects/portfolio
+- **Vercel**: https://vercel.com/farhadesmaeilis-projects/portfolio
+
+---
+
+## 🎨 Design Direction
+
+### استایل کلی
+
+- **تم**: Dark theme اصلی با اکسنت‌های نئون (سبز یا آبی الکتریکی)
+- **فیل**: Futuristic + Hacker aesthetic — مناسب برای یه developer که bug bounty هم کار میکنه
+- **انیمیشن**: فوق حرفه‌ای — از Framer Motion برای همه چیز استفاده کن
+- **تایپوگرافی**: فونت monospace برای کدها + فونت مدرن برای متن
+
+### انیمیشن‌های مورد نیاز
+
+- Typing effect روی hero section
+- Scroll-triggered animations روی همه section ها
+- Particle یا glitch effect روی background
+- Smooth page transitions
+- Hover effects روی کارت‌ها و لینک‌ها
+- Counter animation روی آمارها
+- Parallax scrolling
 
 ---
 
@@ -42,23 +69,8 @@
 
 ```
 portfolio/
-├── .github/
-│   ├── workflows/
-│   │   ├── ci.yml            # Lint + Type Check روی هر push/PR
-│   │   ├── deploy.yml        # Auto deploy به Vercel روی main
-│   │   └── issue-sync.yml    # لیبل‌گذاری خودکار issue ها
-│   ├── ISSUE_TEMPLATE/
-│   │   ├── bug_report.yml
-│   │   ├── feature_request.yml
-│   │   ├── internal_task.yml
-│   │   └── config.yml
-│   ├── PULL_REQUEST_TEMPLATE.md
-│   └── dependabot.yml
-│
-├── .husky/
-│   ├── commit-msg            # commitlint validation
-│   └── pre-commit            # lint-staged
-│
+├── .github/                  ✅ ساخته شده
+├── .husky/                   ✅ ساخته شده
 ├── public/
 │   ├── images/
 │   │   └── avatar.webp
@@ -66,9 +78,9 @@ portfolio/
 │   └── fonts/
 │
 ├── src/
-│   ├── app/                  # Next.js App Router
+│   ├── app/
 │   │   ├── (root)/
-│   │   │   ├── page.tsx      # Home / Hero
+│   │   │   ├── page.tsx          # Home — همه sections
 │   │   │   └── layout.tsx
 │   │   ├── about/
 │   │   │   └── page.tsx
@@ -82,36 +94,55 @@ portfolio/
 │   │   │       └── page.tsx
 │   │   ├── contact/
 │   │   │   └── page.tsx
-│   │   ├── layout.tsx        # Root layout
+│   │   ├── layout.tsx            # Root layout
 │   │   ├── not-found.tsx
 │   │   └── globals.css
 │   │
 │   ├── components/
-│   │   ├── ui/               # Button, Badge, Card, Input و ...
-│   │   ├── layout/           # Header, Footer, Navbar, ThemeToggle
-│   │   ├── sections/         # Hero, About, Projects, Skills, Contact
-│   │   └── shared/           # SEO, AnimatedWrapper و ...
+│   │   ├── ui/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Badge.tsx
+│   │   │   ├── Card.tsx
+│   │   │   └── Input.tsx
+│   │   ├── layout/
+│   │   │   ├── Header.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── Navbar.tsx
+│   │   │   └── MobileMenu.tsx
+│   │   ├── sections/
+│   │   │   ├── HeroSection.tsx
+│   │   │   ├── AboutSection.tsx
+│   │   │   ├── SkillsSection.tsx
+│   │   │   ├── ProjectsSection.tsx
+│   │   │   ├── BlogSection.tsx
+│   │   │   └── ContactSection.tsx
+│   │   └── shared/
+│   │       ├── AnimatedWrapper.tsx
+│   │       ├── TypewriterEffect.tsx
+│   │       ├── ParticleBackground.tsx
+│   │       └── ScrollProgress.tsx
 │   │
-│   ├── content/              # MDX files
+│   ├── content/
 │   │   ├── blog/
 │   │   └── projects/
 │   │
-│   ├── hooks/                # Custom React hooks
+│   ├── hooks/
 │   │   ├── useScrollProgress.ts
-│   │   ├── useTheme.ts
+│   │   ├── useTypingEffect.ts
 │   │   └── useMediaQuery.ts
 │   │
-│   ├── lib/                  # Utility functions
+│   ├── lib/
 │   │   ├── mdx.ts
 │   │   ├── metadata.ts
 │   │   └── utils.ts
 │   │
-│   ├── config/               # Static config
-│   │   ├── site.ts
-│   │   ├── navigation.ts
-│   │   └── socials.ts
+│   ├── config/
+│   │   ├── site.ts               # اطلاعات اصلی سایت
+│   │   ├── navigation.ts         # لینک‌های navbar
+│   │   ├── socials.ts            # لینک‌های شبکه اجتماعی
+│   │   └── skills.ts             # لیست مهارت‌ها
 │   │
-│   ├── types/                # TypeScript types
+│   ├── types/
 │   │   ├── index.ts
 │   │   ├── project.ts
 │   │   └── blog.ts
@@ -120,33 +151,106 @@ portfolio/
 │       └── themes.css
 │
 ├── .env.example
-├── .env.local                # ⚠️ هرگز commit نشود
-├── .gitignore
+├── .env.local
 ├── .prettierrc
 ├── commitlint.config.js
 ├── lint-staged.config.js
 ├── next.config.ts
 ├── package.json
-├── postcss.config.mjs
-├── tsconfig.json
 └── CLAUDE.md
+```
+
+---
+
+## 📄 صفحات پروژه
+
+### Home (/)
+
+شامل همه section های اصلی:
+
+1. **Hero** — اسم، تایتل با typing effect، CTA buttons
+2. **About** — معرفی کوتاه فرهاد
+3. **Skills** — تکنولوژی‌ها با آیکون و انیمیشن
+4. **Projects** — نمونه کارها (چند تا featured)
+5. **Blog** — آخرین مطالب
+6. **Contact** — فرم تماس
+
+### /about
+
+معرفی کامل‌تر + تجربه + تحصیلات
+
+### /projects
+
+لیست همه پروژه‌ها با فیلتر
+
+### /projects/[slug]
+
+صفحه جزئیات هر پروژه
+
+### /blog
+
+لیست همه مطالب آموزشی
+
+### /blog/[slug]
+
+متن کامل هر مطلب (MDX)
+
+### /contact
+
+فرم تماس با Resend
+
+---
+
+## ⚙️ config/site.ts (محتوای پیشنهادی)
+
+```ts
+export const siteConfig = {
+  name: 'Farhad Esmaeili',
+  title: 'Farhad Esmaeili — Full Stack Developer',
+  description: 'Full Stack Developer specializing in Next.js, NestJS, Flutter, and more.',
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://farhadesmaeili.dev',
+  author: {
+    name: 'Farhad Esmaeili',
+    email: 'your@email.com',
+    github: 'https://github.com/farhadesmaeili',
+  },
+  skills: [
+    'Next.js',
+    'NestJS',
+    'Flutter',
+    'Dart',
+    'Python',
+    'TypeScript',
+    'Docker',
+    'Kubernetes',
+    'Linux',
+    'Git',
+    'Tailwind CSS',
+    'WordPress',
+    'Bug Bounty',
+    'HTML',
+    'CSS',
+    'Sass',
+  ],
+};
 ```
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer     | Technology                        |
-| --------- | --------------------------------- |
-| Framework | Next.js 15 (App Router)           |
-| Language  | TypeScript (strict mode)          |
-| Styling   | Tailwind CSS v4                   |
-| Animation | Framer Motion                     |
-| Icons     | Lucide React                      |
-| Linting   | ESLint + Prettier                 |
-| Git Hooks | Husky + lint-staged               |
-| Commits   | Commitlint (Conventional Commits) |
-| CI/CD     | GitHub Actions + Vercel           |
+| Layer     | Technology               |
+| --------- | ------------------------ |
+| Framework | Next.js 15 (App Router)  |
+| Language  | TypeScript (strict mode) |
+| Styling   | Tailwind CSS v4          |
+| Animation | Framer Motion            |
+| Icons     | Lucide React             |
+| Content   | MDX                      |
+| Email     | Resend                   |
+| Linting   | ESLint + Prettier        |
+| Git Hooks | Husky + lint-staged      |
+| CI/CD     | GitHub Actions + Vercel  |
 
 ---
 
@@ -166,53 +270,25 @@ npm run type-check   # Run tsc --noEmit
 
 ## ✅ Git Commit Convention
 
-### فرمت
-
 ```
 <type>(<scope>): <Subject sentence case>
-
-[optional body]
-
-[optional footer]
 ```
 
 ### انواع مجاز
 
-| Type       | کاربرد            |
-| ---------- | ----------------- |
-| `feat`     | ویژگی جدید        |
-| `fix`      | رفع باگ           |
-| `docs`     | مستندات           |
-| `style`    | تغییرات ظاهری کد  |
-| `refactor` | بازسازی کد        |
-| `perf`     | بهبود عملکرد      |
-| `test`     | تست‌ها            |
-| `build`    | سیستم build       |
-| `ci`       | فایل‌های CI/CD    |
-| `chore`    | نگهداری           |
-| `revert`   | بازگرداندن commit |
+feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
 
 ### Scope های مجاز
 
-`api` `ui` `auth` `core` `config` `deps` `docs` `tests` `global`
+api, ui, auth, core, config, deps, docs, tests, global
 
-### مثال‌های درست
-
-```bash
-feat(ui): Add hero section with animated headline
-fix(core): Correct metadata generation for blog posts
-chore(deps): Upgrade next.js to 16.3.0
-ci(config): Add type-check step to workflow
-docs(global): Update README with setup instructions
-```
-
-### مثال‌های غلط
+### مثال
 
 ```bash
-update stuff           # ❌ بدون type
-feat: update           # ❌ توضیح مبهم
-FIX(UI): button        # ❌ type با حرف بزرگ
-feat(unknown): xyz     # ❌ scope نامعتبر
+feat(ui): Add hero section with typing animation
+feat(sections): Add skills section with icon grid
+fix(ui): Correct mobile navbar overflow
+chore(deps): Add framer-motion package
 ```
 
 ---
@@ -220,133 +296,56 @@ feat(unknown): xyz     # ❌ scope نامعتبر
 ## 🌿 Branching Strategy
 
 ```
-main        → Production (protected — فقط از develop merge میشه)
-develop     → Integration (default branch — همه feature ها اینجا merge میشن)
-feature/*   → ویژگی جدید
-fix/*       → رفع باگ
-chore/*     → نگهداری
+main      → Production (auto-deploy Vercel)
+develop   → Integration (default branch)
+feature/* → ویژگی جدید
+fix/*     → رفع باگ
 ```
 
-### Flow کار روزانه
+### Flow کار
 
-```
+```bash
 git checkout develop && git pull
-git checkout -b feature/xxx
+git checkout -b feature/hero-section
 # کد بنویس
-git add . && git commit -m "feat(ui): ..."
-git push -u origin feature/xxx
-# روی GitHub: PR بساز feature/xxx → develop
-# CI باید pass بشه
-# merge کن
-```
-
-### مثال نام branch
-
-```bash
-feature/hero-section
-feature/blog-page
-fix/mobile-navbar
-chore/upgrade-dependencies
+git add . && git commit -m "feat(sections): Add hero section"
+git push -u origin feature/hero-section
+# PR بساز: feature/xxx → develop
+# CI pass بشه → merge کن
 ```
 
 ---
 
-## 🔐 Environment Variables
+## 🤖 قوانین کد برای Claude
 
-```bash
-# .env.example
-
-NEXT_PUBLIC_SITE_URL=https://yourportfolio.vercel.app
-
-# Contact Form
-RESEND_API_KEY=
-```
-
-> ⚠️ هرگز `.env.local` را commit نکن — فقط `.env.example` در git باشد.
-
----
-
-## 🤖 راهنمای Claude
-
-### قوانین کد
-
-1. **هیچ `any` نباشد** — از type های دقیق یا `unknown` استفاده کن
-2. **هر component یک Props interface داشته باشد**
-3. **`'use client'` فقط وقتی ضرورت داره** — در غیر این صورت Server Component باشه
-4. **از `@/` alias استفاده کن** — نه `../../../`
-5. **هر function باید return type داشته باشد**
-6. **از `next/image` برای همه تصاویر استفاده کن**
-7. **هر page باید `generateMetadata` داشته باشد**
-8. **هیچ `console.log` در کد نهایی نباشد**
-9. **named export برای همه — فقط page components default export باشند**
-
-### ساختار component
-
-```tsx
-// ✅ درست
-interface ButtonProps {
-  label: string;
-  onClick: () => void;
-  variant?: 'primary' | 'secondary';
-}
-
-export function Button({ label, onClick, variant = 'primary' }: ButtonProps): JSX.Element {
-  return <button onClick={onClick}>{label}</button>;
-}
-```
-
-### ساختار page
-
-```tsx
-// ✅ درست
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'About | Portfolio',
-  description: '...',
-};
-
-export default function AboutPage(): JSX.Element {
-  return <main>...</main>;
-}
-```
+1. هیچ `any` نباشد
+2. هر component یک Props interface داشته باشد
+3. `'use client'` فقط وقتی ضرورت داره
+4. از `@/` alias استفاده کن
+5. هر function باید return type داشته باشد
+6. از `next/image` برای همه تصاویر
+7. هر page باید `generateMetadata` داشته باشد
+8. هیچ `console.log` در کد نهایی
+9. named export برای همه — فقط page components default export
+10. انیمیشن‌ها با Framer Motion — فوق حرفه‌ای و smooth
 
 ---
 
 ## 📋 Definition of Done
 
-قبل از هر commit:
-
-- [ ] بدون TypeScript error — `npm run type-check`
-- [ ] بدون ESLint error — `npm run lint`
-- [ ] Prettier اعمال شده — `npm run format`
+- [ ] بدون TypeScript error
+- [ ] بدون ESLint error
+- [ ] Prettier اعمال شده
 - [ ] Commit message استاندارده
 - [ ] روی موبایل تست شده
-
----
-
-## 🔒 Branch Protection Rules
-
-### main
-
-- فقط از `develop` merge میشه
-- CI باید pass بشه
-- Force push ممنوع
-- Linear history اجباری
-
-### develop
-
-- همه feature ها اینجا merge میشن
-- Force push ممنوع
-- Default branch
+- [ ] انیمیشن‌ها smooth هستن
 
 ---
 
 ## 🚀 Deployment
 
-- هر push به `main` → auto deploy به Vercel
-- هر PR → preview deploy خودکار
-- Vercel Dashboard: https://vercel.com/farhadesmaeilis-projects/portfolio
+- هر push به `main` → auto deploy Vercel
+- هر PR → preview deploy
 
 ---
 
