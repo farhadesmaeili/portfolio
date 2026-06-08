@@ -8,11 +8,12 @@ on:
   pull_request:
 
 jobs:
-  build:
+  lint-and-type-check:
+    name: Lint & Type Check
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x] # فقط 20 — چون package.json ات 20 داره
+        node-version: [20.x]
 
     steps:
       - name: Checkout repository
