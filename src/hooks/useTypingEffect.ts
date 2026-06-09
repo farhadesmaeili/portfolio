@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface UseTypingEffectOptions {
   words: string[];
@@ -14,39 +14,78 @@ interface UseTypingEffectResult {
   isTyping: boolean;
 }
 
+/**
+ * Rewritten to use a single stable useEffect with mutable refs.
+ *
+ * The previous version had `text` in the deps array, which caused the
+ * effect to cleanup and recreate a new setTimeout on EVERY character
+ * change. On iOS Safari with slower JS execution, concurrent renders
+ * (from GlitchText's setInterval) could cancel the pending timeout
+ * before it fired, starving the typing loop entirely.
+ *
+ * Using refs for mutable state means the effect only mounts/unmounts
+ * once per `words` reference change — no cancellation race.
+ */
 export function useTypingEffect({
   words,
   typeSpeed = 80,
   deleteSpeed = 50,
   pauseDuration = 2000,
 }: UseTypingEffectOptions): UseTypingEffectResult {
-  const [wordIndex, setWordIndex] = useState(0);
-  const [text, setText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [output, setOutput] = useState('');
+  const [isTyping, setIsTyping] = useState(true);
+
+  // All mutable typing state lives in a ref — changes don't trigger re-renders
+  const state = useRef<{
+    wordIndex: number;
+    charIndex: number;
+    isDeleting: boolean;
+    timerId: ReturnType<typeof setTimeout> | undefined;
+  }>({
+    wordIndex: 0,
+    charIndex: 0,
+    isDeleting: false,
+    timerId: undefined,
+  });
 
   useEffect(() => {
-    const currentWord = words[wordIndex % words.length] ?? '';
-    const isFullyTyped = !isDeleting && text === currentWord;
-    const isFullyDeleted = isDeleting && text === '';
+    const s = state.current;
 
-    let delay = isDeleting ? deleteSpeed : typeSpeed;
-    if (isFullyTyped) delay = pauseDuration;
+    function tick(): void {
+      const word = words[s.wordIndex % words.length] ?? '';
 
-    const timeout = setTimeout(() => {
-      if (isFullyTyped) {
-        setIsDeleting(true);
-      } else if (isFullyDeleted) {
-        setIsDeleting(false);
-        setWordIndex((prev) => (prev + 1) % words.length);
-      } else if (isDeleting) {
-        setText((prev) => prev.slice(0, -1));
+      if (!s.isDeleting) {
+        s.charIndex += 1;
+        setOutput(word.slice(0, s.charIndex));
+        setIsTyping(true);
+
+        if (s.charIndex >= word.length) {
+          // Fully typed — pause, then start deleting
+          s.timerId = setTimeout(() => {
+            s.isDeleting = true;
+            tick();
+          }, pauseDuration);
+          return;
+        }
       } else {
-        setText(currentWord.slice(0, text.length + 1));
+        s.charIndex -= 1;
+        setOutput(word.slice(0, s.charIndex));
+        setIsTyping(false);
+
+        if (s.charIndex <= 0) {
+          s.isDeleting = false;
+          s.wordIndex = (s.wordIndex + 1) % words.length;
+        }
       }
-    }, delay);
 
-    return () => clearTimeout(timeout);
-  }, [text, isDeleting, wordIndex, words, typeSpeed, deleteSpeed, pauseDuration]);
+      s.timerId = setTimeout(tick, s.isDeleting ? deleteSpeed : typeSpeed);
+    }
 
-  return { text, isTyping: !isDeleting };
+    // Kick off first character after one typeSpeed delay
+    s.timerId = setTimeout(tick, typeSpeed);
+
+    return () => clearTimeout(s.timerId);
+  }, [words, typeSpeed, deleteSpeed, pauseDuration]);
+
+  return { text: output, isTyping };
 }
