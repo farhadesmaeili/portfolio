@@ -107,7 +107,7 @@ export function HeroSection(): ReactElement {
               <div className="absolute inset-0 rounded-full shadow-[0_0_0_2px_#00ff41,0_0_20px_rgba(0,255,65,0.5),0_0_50px_rgba(0,255,65,0.18)]" />
               {/* Avatar */}
               <Image
-                src="/images/avatar.png"
+                src="/images/avatar.webp"
                 alt="Farhad Esmaeili — Full Stack Developer"
                 fill
                 sizes="(max-width: 640px) 144px, (max-width: 768px) 176px, (max-width: 1024px) 288px, 320px"
