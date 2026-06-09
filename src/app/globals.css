@@ -103,3 +103,104 @@ body {
     0 0 40px rgba(0, 255, 65, 0.12);
   animation: glitch 5s ease-in-out infinite;
 }
+
+/* ─── Entrance keyframe ──────────────────────────────────────────────
+   IMPORTANT: `to` uses `transform: none` (not translateY(0)).
+   On iOS Safari, translateY(0) is still an *active* transform — it
+   creates a compositing layer that breaks touch-event dispatch on
+   descendant or sibling fixed elements (header button).
+   `transform: none` removes the property entirely after the animation
+   and avoids the stacking-context side-effect.
+   ──────────────────────────────────────────────────────────────────── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Header: opacity only — never leave any transform on the element */
+@keyframes header-down {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Scroll indicator bounce (separate keyframe, no fill-mode conflict) */
+@keyframes scroll-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+
+/* Header entrance */
+.header-in {
+  animation: header-down 0.5s ease-out 0.05s both;
+}
+
+/* Slow ring spin for avatar decoration */
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+/* Hero staggered items */
+.hero-in-0 {
+  animation: fade-up 0.55s ease-out 0s both;
+}
+.hero-in-1 {
+  animation: fade-up 0.55s ease-out 0.1s both;
+}
+.hero-in-2 {
+  animation: fade-up 0.55s ease-out 0.25s both;
+}
+.hero-in-3 {
+  animation: fade-up 0.55s ease-out 0.4s both;
+}
+.hero-in-4 {
+  animation: fade-up 0.55s ease-out 0.55s both;
+}
+.hero-in-5 {
+  animation: fade-up 0.55s ease-out 0.7s both;
+}
+
+/* Scroll indicator: fades in, then bounces */
+.scroll-indicator {
+  opacity: 0;
+  animation:
+    fade-up 0.5s ease-out 1.4s forwards,
+    scroll-bounce 1.8s ease-in-out 1.9s infinite;
+}
+
+/* Reduced-motion: skip all entrance animations, show everything immediately */
+@media (prefers-reduced-motion: reduce) {
+  .header-in,
+  .hero-in-1,
+  .hero-in-2,
+  .hero-in-3,
+  .hero-in-4,
+  .hero-in-5 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .scroll-indicator {
+    animation: none;
+    opacity: 1;
+  }
+}
