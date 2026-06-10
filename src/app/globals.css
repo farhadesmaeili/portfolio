@@ -204,6 +204,19 @@ body {
     scroll-bounce 1.8s ease-in-out 1.9s infinite;
 }
 
+/* Online status pulse for contact section */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 6px rgba(0, 255, 65, 0.85);
+  }
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 3px rgba(0, 255, 65, 0.35);
+  }
+}
+
 /* Reduced-motion: skip all entrance animations, show everything immediately */
 @media (prefers-reduced-motion: reduce) {
   .header-in,
