@@ -1,19 +1,15 @@
 import type { Metadata } from 'next';
 import type { ReactElement, ReactNode } from 'react';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { JetBrains_Mono } from 'next/font/google';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { siteConfig } from '@/config/site';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-jetbrains',
   subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -50,12 +46,9 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps): ReactElement {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable}`}
-      suppressHydrationWarning
-    >
-      <body className="bg-background text-foreground flex min-h-screen flex-col antialiased">
+    <html lang="en" className={jetbrainsMono.variable} suppressHydrationWarning>
+      <body className="bg-background text-foreground flex min-h-screen flex-col font-mono antialiased">
+        <div className="crt-overlay" aria-hidden="true" />
         <Header />
         <main className="flex-1 pt-16">{children}</main>
         <Footer />

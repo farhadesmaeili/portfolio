@@ -44,7 +44,7 @@ export function HeroSection(): ReactElement {
             </p>
 
             {/* Name */}
-            <h1 className="hero-in-2 name-glow text-foreground mb-5 text-5xl leading-none font-bold tracking-tight sm:text-6xl md:text-4xl lg:text-5xl xl:text-6xl">
+            <h1 className="hero-in-2 name-glow text-foreground mb-5 text-4xl leading-none font-bold tracking-tight sm:text-5xl md:text-4xl lg:text-5xl xl:text-6xl">
               <AnimatedName text="Farhad Esmaeili" />
             </h1>
 

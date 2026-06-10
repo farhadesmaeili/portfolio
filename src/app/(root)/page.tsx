@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactElement } from 'react';
 import { HeroSection } from '@/components/sections/HeroSection';
+import { SkillsSection } from '@/components/sections/SkillsSection';
 import { siteConfig } from '@/config/site';
 
 export const metadata: Metadata = {
@@ -11,5 +12,10 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage(): ReactElement {
-  return <HeroSection />;
+  return (
+    <>
+      <HeroSection />
+      <SkillsSection />
+    </>
+  );
 }
