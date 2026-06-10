@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactElement, MouseEvent as ReactMouseEvent } from 'react';
-import { useState, useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   motion,
   useInView,
@@ -31,30 +31,17 @@ interface FloatingChar {
 
 const MATRIX_CHARS = '01アイウエオカキ@#$%&*ABCDEFabcdef0123456789{}[]<>=+-/\\';
 
-// ─── Hydration-safe random chars (useSyncExternalStore pattern) ───────────────
-// Server snapshot → [] so the initial HTML matches; client snapshot → stable
-// random chars generated once after mount. Avoids useEffect setState entirely.
+// ─── Floating chars generator (client-only, never runs on server) ─────────────
 
-let _charsCache: FloatingChar[] | null = null;
-
-function getCharsSnapshot(): FloatingChar[] {
-  if (_charsCache === null) {
-    _charsCache = Array.from({ length: 26 }, (_, i) => ({
-      id: i,
-      char: MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)] ?? '0',
-      x: Math.random() * 100,
-      duration: 10 + Math.random() * 16,
-      delay: Math.random() * 9,
-      opacity: 0.038 + Math.random() * 0.072,
-    }));
-  }
-  return _charsCache;
-}
-
-const EMPTY_CHARS: FloatingChar[] = [];
-
-function getEmptyChars(): FloatingChar[] {
-  return EMPTY_CHARS;
+function generateFloatingChars(): FloatingChar[] {
+  return Array.from({ length: 60 }, (_, i) => ({
+    id: i,
+    char: MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)] ?? '0',
+    x: Math.random() * 100,
+    duration: 10 + Math.random() * 16,
+    delay: Math.random() * 9,
+    opacity: 0.2 + Math.random() * 0.085,
+  }));
 }
 
 const EASE_OUT_CUBIC = [0.22, 1, 0.36, 1] as const;
@@ -411,11 +398,21 @@ export function SkillsSection(): ReactElement {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
-  const noMotion = useReducedMotion() ?? false;
+  const prefersReducedMotion = useReducedMotion() ?? false;
+  const [mounted, setMounted] = useState(false);
+  const [floatingChars, setFloatingChars] = useState<FloatingChar[]>([]);
   const isSectionInView = useInView(sectionRef, { once: true, margin: '-80px' });
   const isHeaderInView = useInView(headerRef, { once: true, margin: '-70px' });
 
-  const floatingChars = useSyncExternalStore(() => () => {}, getCharsSnapshot, getEmptyChars);
+  const noMotion = prefersReducedMotion && mounted;
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setMounted(true);
+      setFloatingChars(generateFloatingChars());
+    }, 0);
+    return () => clearTimeout(id);
+  }, []);
 
   const filteredSkills = active === 'All' ? SKILLS : SKILLS.filter((s) => s.category === active);
 
