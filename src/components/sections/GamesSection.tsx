@@ -50,7 +50,7 @@ function GamePlayer({ game, onClose }: GamePlayerProps): ReactElement {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-2 backdrop-blur-sm sm:p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -60,14 +60,14 @@ function GamePlayer({ game, onClose }: GamePlayerProps): ReactElement {
         initial={{ y: -16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className="mb-3 flex w-full max-w-2xl items-center justify-between"
+        className="mb-2 flex w-full max-w-2xl items-center justify-between"
       >
-        <div className="flex items-center gap-2">
-          <Terminal size={13} className="text-accent" />
+        <div className="flex items-center gap-2 overflow-hidden">
+          <Terminal size={13} className="text-accent shrink-0" />
           <span className="text-accent font-mono text-xs tracking-widest uppercase">
             {game.name}
           </span>
-          <span className="text-muted font-mono text-[10px] opacity-60">
+          <span className="text-muted hidden font-mono text-[10px] opacity-60 sm:inline">
             {'// '}
             {game.controls}
           </span>
@@ -75,7 +75,7 @@ function GamePlayer({ game, onClose }: GamePlayerProps): ReactElement {
         <button
           onClick={onClose}
           aria-label="Close game"
-          className="border-border text-muted hover:border-accent/40 hover:text-accent flex items-center gap-1.5 border px-3 py-1.5 font-mono text-xs transition-all duration-200"
+          className="border-border text-muted hover:border-accent/40 hover:text-accent flex shrink-0 items-center gap-1.5 border px-3 py-1.5 font-mono text-xs transition-all duration-200"
         >
           <X size={12} />
           ESC
@@ -88,7 +88,7 @@ function GamePlayer({ game, onClose }: GamePlayerProps): ReactElement {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.35, delay: 0.12, ease: EASE_OUT }}
         className="border-accent/20 bg-surface relative w-full max-w-2xl border"
-        style={{ aspectRatio: '1 / 1', maxHeight: '70vh' }}
+        style={{ aspectRatio: '1 / 1', maxHeight: 'min(70vh, calc(100vw - 16px))' }}
       >
         {/* Corner decorations */}
         <span className="border-accent/40 absolute top-0 left-0 block h-3 w-3 border-t border-l" />

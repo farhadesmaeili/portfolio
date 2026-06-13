@@ -126,15 +126,32 @@
       const overlayTitle = document.getElementById('overlay-title');
       const overlaySub = document.getElementById('overlay-sub');
 
-      const CELL = 20;
       const COLS = 20;
       const ROWS = 20;
-      const W = CELL * COLS;
-      const H = CELL * ROWS;
 
-      canvas.width = W;
-      canvas.height = H;
-      document.getElementById('canvas-wrap').style.width = W + 'px';
+      function calcSize() {
+        // Reserve ~100px for header + footer inside the iframe
+        const maxPx = Math.min(window.innerWidth - 4, window.innerHeight - 100, 400);
+        return Math.floor(maxPx / COLS) * COLS; // snap to grid multiple
+      }
+
+      let SIZE = calcSize();
+      let CELL = SIZE / COLS;
+      let W = SIZE;
+      let H = SIZE;
+
+      function resizeCanvas() {
+        SIZE = calcSize();
+        CELL = SIZE / COLS;
+        W = SIZE;
+        H = SIZE;
+        canvas.width = W;
+        canvas.height = H;
+        document.getElementById('canvas-wrap').style.width = W + 'px';
+      }
+
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
 
       let snake, dir, nextDir, food, score, best, gameLoop, state;
       best = 0;
