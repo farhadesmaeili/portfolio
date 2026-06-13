@@ -47,6 +47,13 @@ export function Footer(): ReactElement {
         <p className="text-muted order-2 font-mono text-xs sm:order-1">
           <span className="text-accent">&copy;{year}</span> {siteConfig.name}
           <span className="text-muted/50 ml-2 hidden sm:inline">{'// all rights reserved'}</span>
+          <Link
+            href="/games"
+            className="text-muted/30 hover:text-accent/60 ml-3 hidden transition-colors duration-300 sm:inline"
+            aria-label="Games"
+          >
+            {'// games'}
+          </Link>
         </p>
 
         <div className="order-1 flex items-center gap-5 sm:order-2">
