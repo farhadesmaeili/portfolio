@@ -21,4 +21,14 @@ export const GAMES: Game[] = [
     difficulty: 'easy',
     controls: 'WASD / Arrow Keys',
   },
+  {
+    id: 'invaders',
+    name: 'invaders.exe',
+    description:
+      'Pixel alien swarms descend on the perimeter. Eliminate all threats before the breach.',
+    src: '/games/invaders.html',
+    tags: ['HTML5', 'Canvas', 'Arcade'],
+    difficulty: 'medium',
+    controls: 'WASD / Arrows + Space',
+  },
 ];

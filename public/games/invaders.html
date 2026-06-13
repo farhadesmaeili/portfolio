@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>invaders.exe</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #0a0a0a;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-family: 'Courier New', monospace;
+        color: #00ff41;
+        overflow: hidden;
+        user-select: none;
+      }
+      header {
+        text-align: center;
+        margin-bottom: 8px;
+      }
+      header h1 {
+        font-size: 1rem;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        text-shadow: 0 0 14px #00ff41;
+      }
+      #hud {
+        display: flex;
+        gap: 16px;
+        font-size: 0.62rem;
+        opacity: 0.65;
+        letter-spacing: 0.12em;
+        margin-top: 4px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      #canvas-wrap {
+        position: relative;
+        border: 1px solid rgba(0, 255, 65, 0.25);
+        box-shadow:
+          0 0 40px rgba(0, 255, 65, 0.08),
+          inset 0 0 40px rgba(0, 0, 0, 0.6);
+      }
+      canvas {
+        display: block;
+      }
+      #overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.88);
+        backdrop-filter: blur(6px);
+      }
+      #overlay-title {
+        font-size: 1.2rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        text-shadow: 0 0 18px #00ff41;
+        margin-bottom: 6px;
+      }
+      #overlay-sub {
+        font-size: 0.6rem;
+        opacity: 0.55;
+        letter-spacing: 0.16em;
+        margin-bottom: 24px;
+        text-align: center;
+        line-height: 2;
+      }
+      #start-btn {
+        background: transparent;
+        border: 1px solid rgba(0, 255, 65, 0.45);
+        color: #00ff41;
+        font-family: 'Courier New', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        padding: 10px 28px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      #start-btn:hover,
+      #start-btn:active {
+        background: rgba(0, 255, 65, 0.1);
+        border-color: #00ff41;
+        box-shadow: 0 0 22px rgba(0, 255, 65, 0.28);
+      }
+      footer {
+        margin-top: 6px;
+        font-size: 0.55rem;
+        opacity: 0.28;
+        letter-spacing: 0.12em;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>invaders.exe</h1>
+      <div id="hud">
+        <span>SCORE: <span id="score">0000</span></span>
+        <span>BEST: <span id="best">0000</span></span>
+        <span>LIVES: <span id="lives">♥♥♥</span></span>
+        <span>WAVE: <span id="wave">01</span></span>
+      </div>
+    </header>
+
+    <div id="canvas-wrap">
+      <canvas id="c"></canvas>
+      <div id="overlay">
+        <h2 id="overlay-title">INVADERS.EXE</h2>
+        <p id="overlay-sub">
+          ARROWS / WASD — MOVE<br />SPACE — FIRE<br />TOUCH: ◄ ▌ ► ZONES ON SCREEN
+        </p>
+        <button id="start-btn">[ INITIALIZE ]</button>
+      </div>
+    </div>
+
+    <footer>// defend the perimeter — eliminate all threats</footer>
+
+    <script>
+      // ── Canvas setup ──────────────────────────────────────────────────────────
+      const canvas = document.getElementById('c');
+      const ctx = canvas.getContext('2d');
+      const overlay = document.getElementById('overlay');
+      const startBtn = document.getElementById('start-btn');
+      const scoreEl = document.getElementById('score');
+      const bestEl = document.getElementById('best');
+      const livesEl = document.getElementById('lives');
+      const waveEl = document.getElementById('wave');
+      const overlayTitle = document.getElementById('overlay-title');
+      const overlaySub = document.getElementById('overlay-sub');
+
+      const ALIEN_COLS = 8;
+      const ALIEN_ROWS = 4;
+      const BULLET_W = 2;
+
+      function calcSize() {
+        const maxW = Math.min(window.innerWidth - 4, 420);
+        const maxH = Math.min(window.innerHeight - 110, 520);
+        return { W: Math.floor(maxW), H: Math.floor(Math.min(maxW * 1.25, maxH)) };
+      }
+
+      let { W, H } = calcSize();
+
+      function resizeCanvas() {
+        const s = calcSize();
+        W = s.W;
+        H = s.H;
+        canvas.width = W;
+        canvas.height = H;
+      }
+
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      // ── State ─────────────────────────────────────────────────────────────────
+      let state = 'idle'; // idle | playing | dead
+      let score = 0,
+        best = 0,
+        lives = 3,
+        wave = 1;
+      let player, playerBullets, alienBullets, aliens;
+      let alienDir, alienMoveTimer, alienMoveInterval;
+      let rafId = null;
+
+      // ── Derived sizes (called per frame so they scale after resize) ───────────
+      const S = () => ({
+        playerW: W * 0.075,
+        playerH: W * 0.055,
+        playerSpeed: W * 0.007,
+        playerY: H * 0.88,
+        bulletSpeed: H * 0.014,
+        alienBulletSpeed: H * 0.007,
+        alienStep: W * 0.016,
+        alienDropY: H * 0.038,
+      });
+
+      // ── Init ──────────────────────────────────────────────────────────────────
+      function initGame(newGame) {
+        if (newGame) {
+          wave = 1;
+          score = 0;
+          lives = 3;
+        }
+        const s = S();
+        player = {
+          x: W / 2 - s.playerW / 2,
+          y: s.playerY,
+          w: s.playerW,
+          h: s.playerH,
+          cooldown: 0,
+        };
+        playerBullets = [];
+        alienBullets = [];
+
+        const alienW = W / (ALIEN_COLS + 2);
+        const alienH = alienW * 0.65;
+        const gapX = alienW * 0.5;
+        const gapY = alienH * 0.65;
+        const gridW = ALIEN_COLS * alienW + (ALIEN_COLS - 1) * gapX;
+        const startX = (W - gridW) / 2;
+        const startY = H * 0.06;
+
+        aliens = [];
+        for (let r = 0; r < ALIEN_ROWS; r++) {
+          for (let c = 0; c < ALIEN_COLS; c++) {
+            aliens.push({
+              x: startX + c * (alienW + gapX),
+              y: startY + r * (alienH + gapY),
+              w: alienW,
+              h: alienH,
+              row: r,
+              dead: false,
+              frame: 0,
+            });
+          }
+        }
+
+        alienDir = 1;
+        alienMoveTimer = 0;
+        alienMoveInterval = Math.max(8, 38 - wave * 3);
+        updateHUD();
+      }
+
+      function updateHUD() {
+        scoreEl.textContent = String(score).padStart(4, '0');
+        if (score > best) {
+          best = score;
+          bestEl.textContent = String(best).padStart(4, '0');
+        }
+        livesEl.textContent = '♥'.repeat(lives) + '♡'.repeat(Math.max(0, 3 - lives));
+        waveEl.textContent = String(wave).padStart(2, '0');
+      }
+
+      // ── Input ─────────────────────────────────────────────────────────────────
+      const keys = {};
+      document.addEventListener('keydown', (e) => {
+        keys[e.key] = true;
+        if (e.key === ' ') e.preventDefault();
+      });
+      document.addEventListener('keyup', (e) => {
+        keys[e.key] = false;
+      });
+
+      const touch = { left: false, right: false, fire: false };
+
+      function getTouchZone(clientX) {
+        const rect = canvas.getBoundingClientRect();
+        const rel = (clientX - rect.left) / rect.width;
+        if (rel < 0.33) return 'left';
+        if (rel > 0.67) return 'right';
+        return 'fire';
+      }
+
+      canvas.addEventListener(
+        'touchstart',
+        (e) => {
+          e.preventDefault();
+          for (const t of e.changedTouches) {
+            const z = getTouchZone(t.clientX);
+            touch[z] = true;
+          }
+        },
+        { passive: false },
+      );
+      canvas.addEventListener(
+        'touchend',
+        (e) => {
+          e.preventDefault();
+          touch.left = false;
+          touch.right = false;
+          touch.fire = false;
+        },
+        { passive: false },
+      );
+      canvas.addEventListener(
+        'touchcancel',
+        (e) => {
+          e.preventDefault();
+          touch.left = false;
+          touch.right = false;
+          touch.fire = false;
+        },
+        { passive: false },
+      );
+
+      // ── Game over helpers ─────────────────────────────────────────────────────
+      function endGame(title, sub) {
+        state = 'dead';
+        overlayTitle.textContent = title;
+        overlaySub.textContent = sub;
+        startBtn.textContent = '[ RESTART ]';
+        overlay.style.display = 'flex';
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+
+      function nextWave() {
+        wave++;
+        updateHUD();
+        overlayTitle.textContent = 'WAVE ' + String(wave).padStart(2, '0');
+        overlaySub.textContent = 'THREAT LEVEL INCREASING';
+        startBtn.textContent = '[ CONTINUE ]';
+        overlay.style.display = 'flex';
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          initGame(false);
+          state = 'playing';
+          rafId = requestAnimationFrame(loop);
+        }, 1100);
+      }
+
+      // ── Tick ──────────────────────────────────────────────────────────────────
+      function tick() {
+        const s = S();
+
+        // Player movement
+        const movingLeft = keys['ArrowLeft'] || keys['a'] || keys['A'] || touch.left;
+        const movingRight = keys['ArrowRight'] || keys['d'] || keys['D'] || touch.right;
+        const firing = keys[' '] || touch.fire;
+
+        if (movingLeft) player.x -= s.playerSpeed;
+        if (movingRight) player.x += s.playerSpeed;
+        player.x = Math.max(0, Math.min(W - player.w, player.x));
+
+        if (player.cooldown > 0) player.cooldown--;
+        if (firing && player.cooldown === 0) {
+          playerBullets.push({ x: player.x + player.w / 2 - BULLET_W / 2, y: player.y, vy: -s.bulletSpeed });
+          player.cooldown = 16;
+        }
+
+        // Move bullets
+        for (const b of playerBullets) b.y += b.vy;
+        for (const b of alienBullets) b.y += b.vy;
+
+        // Alien movement
+        alienMoveTimer++;
+        if (alienMoveTimer >= alienMoveInterval) {
+          alienMoveTimer = 0;
+          const alive = aliens.filter((a) => !a.dead);
+          if (alive.length === 0) return nextWave();
+
+          const leftmost = Math.min(...alive.map((a) => a.x));
+          const rightmost = Math.max(...alive.map((a) => a.x + a.w));
+          let drop = false;
+          if (alienDir === 1 && rightmost + s.alienStep > W) {
+            alienDir = -1;
+            drop = true;
+          } else if (alienDir === -1 && leftmost - s.alienStep < 0) {
+            alienDir = 1;
+            drop = true;
+          }
+
+          for (const a of aliens) {
+            if (a.dead) continue;
+            a.x += drop ? 0 : s.alienStep * alienDir;
+            a.y += drop ? s.alienDropY : 0;
+            a.frame ^= 1;
+            if (a.y + a.h >= player.y) return endGame('BREACH', 'THE INVADERS HAVE LANDED');
+          }
+
+          // Speed up as fewer aliens remain
+          alienMoveInterval = Math.max(4, Math.round((38 - wave * 3) * (alive.length / (ALIEN_COLS * ALIEN_ROWS))));
+        }
+
+        // Alien random shooting
+        const alive = aliens.filter((a) => !a.dead);
+        const fireChance = 0.003 + wave * 0.0005;
+        for (const a of alive) {
+          if (Math.random() < fireChance / alive.length) {
+            alienBullets.push({ x: a.x + a.w / 2 - BULLET_W / 2, y: a.y + a.h, vy: s.alienBulletSpeed });
+          }
+        }
+
+        // Player bullets vs aliens
+        for (const b of playerBullets) {
+          if (b.dead) continue;
+          for (const a of aliens) {
+            if (a.dead) continue;
+            if (b.x < a.x + a.w && b.x + BULLET_W > a.x && b.y < a.y + a.h && b.y + H * 0.02 > a.y) {
+              a.dead = true;
+              b.dead = true;
+              score += (ALIEN_ROWS - a.row) * 10;
+              updateHUD();
+            }
+          }
+        }
+
+        // Alien bullets vs player
+        for (const b of alienBullets) {
+          if (b.dead) continue;
+          if (b.x < player.x + player.w && b.x + BULLET_W > player.x && b.y + H * 0.02 > player.y && b.y < player.y + player.h) {
+            b.dead = true;
+            lives--;
+            updateHUD();
+            if (lives <= 0) return endGame('SYSTEM CRASH', 'ALL LIVES DEPLETED');
+          }
+        }
+
+        // Cull off-screen bullets
+        playerBullets = playerBullets.filter((b) => !b.dead && b.y > -20);
+        alienBullets = alienBullets.filter((b) => !b.dead && b.y < H + 20);
+
+        if (aliens.every((a) => a.dead)) nextWave();
+      }
+
+      // ── Draw ──────────────────────────────────────────────────────────────────
+      const ALIEN_COLORS = ['#ff6b35', '#ff6b35', '#00d4ff', '#00d4ff'];
+
+      function drawAlien(a) {
+        if (a.dead) return;
+        const color = ALIEN_COLORS[a.row] ?? '#00ff41';
+        const { x, y, w, h, frame: f } = a;
+
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 5;
+
+        if (a.row <= 1) {
+          // UFO style
+          ctx.fillRect(x + w * 0.2, y, w * 0.6, h * 0.28);
+          ctx.fillRect(x, y + h * 0.28, w, h * 0.42);
+          if (f === 0) {
+            ctx.fillRect(x + w * 0.1, y + h * 0.7, w * 0.22, h * 0.3);
+            ctx.fillRect(x + w * 0.68, y + h * 0.7, w * 0.22, h * 0.3);
+          } else {
+            ctx.fillRect(x, y + h * 0.7, w * 0.22, h * 0.3);
+            ctx.fillRect(x + w * 0.78, y + h * 0.7, w * 0.22, h * 0.3);
+          }
+        } else {
+          // Crab style
+          ctx.fillRect(x + w * 0.3, y, w * 0.4, h * 0.28);
+          ctx.fillRect(x + w * 0.1, y + h * 0.28, w * 0.8, h * 0.42);
+          if (f === 0) {
+            ctx.fillRect(x, y + h * 0.7, w * 0.28, h * 0.3);
+            ctx.fillRect(x + w * 0.72, y + h * 0.7, w * 0.28, h * 0.3);
+          } else {
+            ctx.fillRect(x + w * 0.1, y + h * 0.7, w * 0.28, h * 0.3);
+            ctx.fillRect(x + w * 0.62, y + h * 0.7, w * 0.28, h * 0.3);
+          }
+        }
+        ctx.shadowBlur = 0;
+      }
+
+      function draw() {
+        const s = S();
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(0, 0, W, H);
+
+        // Grid
+        ctx.strokeStyle = 'rgba(0,255,65,0.03)';
+        ctx.lineWidth = 0.5;
+        const step = W / 20;
+        for (let x = 0; x <= W; x += step) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, H);
+          ctx.stroke();
+        }
+        for (let y = 0; y <= H; y += step) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y);
+          ctx.stroke();
+        }
+
+        // Ground line
+        ctx.strokeStyle = 'rgba(0,255,65,0.14)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, s.playerY + s.playerH * 1.2);
+        ctx.lineTo(W, s.playerY + s.playerH * 1.2);
+        ctx.stroke();
+
+        // Touch zone hint (mobile only)
+        if (window.matchMedia('(pointer: coarse)').matches) {
+          const zh = H * 0.38;
+          const zy = H - zh;
+          ctx.fillStyle = 'rgba(0,255,65,0.04)';
+          ctx.fillRect(0, zy, W * 0.33, zh);
+          ctx.fillRect(W * 0.67, zy, W * 0.33, zh);
+          ctx.fillStyle = 'rgba(0,255,65,0.05)';
+          ctx.fillRect(W * 0.33, zy, W * 0.34, zh);
+          const fs = Math.round(W * 0.05);
+          ctx.font = `${fs}px 'Courier New'`;
+          ctx.textAlign = 'center';
+          ctx.fillStyle = 'rgba(0,255,65,0.2)';
+          ctx.fillText('◄', W * 0.165, H - zh * 0.3);
+          ctx.fillText('FIRE', W * 0.5, H - zh * 0.3);
+          ctx.fillText('►', W * 0.835, H - zh * 0.3);
+        }
+
+        // Player
+        ctx.shadowColor = '#00ff41';
+        ctx.shadowBlur = 14;
+        ctx.fillStyle = '#00ff41';
+        ctx.beginPath();
+        ctx.moveTo(player.x + player.w / 2, player.y);
+        ctx.lineTo(player.x + player.w, player.y + player.h);
+        ctx.lineTo(player.x, player.y + player.h);
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Player bullets
+        ctx.fillStyle = '#00ff41';
+        ctx.shadowColor = '#00ff41';
+        ctx.shadowBlur = 7;
+        const bh = H * 0.022;
+        for (const b of playerBullets) ctx.fillRect(b.x, b.y, BULLET_W, bh);
+        ctx.shadowBlur = 0;
+
+        // Alien bullets
+        ctx.fillStyle = '#ff4444';
+        ctx.shadowColor = '#ff4444';
+        ctx.shadowBlur = 7;
+        for (const b of alienBullets) ctx.fillRect(b.x, b.y, BULLET_W, bh);
+        ctx.shadowBlur = 0;
+
+        // Aliens
+        for (const a of aliens) drawAlien(a);
+      }
+
+      // ── Loop ──────────────────────────────────────────────────────────────────
+      function loop() {
+        if (state !== 'playing') return;
+        tick();
+        draw();
+        rafId = requestAnimationFrame(loop);
+      }
+
+      // ── Start button ──────────────────────────────────────────────────────────
+      startBtn.addEventListener('click', () => {
+        const isNew = state === 'idle' || state === 'dead';
+        initGame(isNew);
+        overlay.style.display = 'none';
+        state = 'playing';
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(loop);
+      });
+
+      // Initial blank render
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, W, H);
+    </script>
+  </body>
+</html>
