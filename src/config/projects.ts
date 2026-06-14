@@ -33,12 +33,29 @@ export const PROJECTS: Project[] = [
     category: 'web',
     status: 'live',
     github: `${siteConfig.author.github}/portfolio`,
-    live: siteConfig.url,
+    live: 'https://farhades.vercel.app/',
     year: '2026',
     highlights: [
       'App Router + React Server Components architecture',
       'Canvas 2D API — interactive drag-to-rotate 3D wireframe globe',
       'Husky · commitlint · GitHub Actions CI/CD pipeline',
+    ],
+  },
+  {
+    id: 'farhmyst-bio',
+    title: 'FarhMyst Bio',
+    description:
+      'A terminal-styled link-in-bio landing page with a layered, scroll-driven narrative that unfolds the "hacker/builder" brand across Code, AI & Data, and Security — capped with a contact call-to-action.',
+    tech: ['HTML', 'CSS', 'JavaScript', 'Three.js', 'WebGL', 'GitHub Pages'],
+    category: 'web',
+    status: 'live',
+    github: `${siteConfig.author.github}/farhmyst-bio`,
+    live: 'https://farhadesmaeili.github.io/farhmyst-bio/',
+    year: '2026',
+    highlights: [
+      'Single-file build — no framework or bundler, just HTML, raw CSS & vanilla JS',
+      'Three stacked graphic layers: video base + WebGL/Three.js 3D object + CSS effects',
+      'Deployed on GitHub Pages with Telegram · GitHub · LinkedIn links',
     ],
   },
 ];

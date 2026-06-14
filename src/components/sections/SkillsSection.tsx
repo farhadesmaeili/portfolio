@@ -124,7 +124,7 @@ interface StatsRowProps {
 function StatsRow({ isInView }: StatsRowProps): ReactElement {
   const skills = useCountUp(SKILLS.length, isInView, 350);
   const domains = useCountUp(SKILL_CATEGORIES.length, isInView, 550);
-  const years = useCountUp(5, isInView, 750);
+  const years = useCountUp(7, isInView, 750);
 
   const entries = [
     { value: skills, label: 'SKILLS', suffix: '+' },
