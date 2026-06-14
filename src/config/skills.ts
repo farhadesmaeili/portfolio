@@ -53,6 +53,8 @@ export const SKILLS: Skill[] = [
   { name: 'GitHub', category: 'DevOps', abbr: 'GH', level: 92 },
   { name: 'CI/CD', category: 'DevOps', abbr: 'CI', level: 80 },
   { name: 'Vercel', category: 'DevOps', abbr: 'VC', level: 88 },
+  { name: 'Claude AI', category: 'DevOps', abbr: 'CL', level: 90 },
+  { name: 'Claude Code', category: 'DevOps', abbr: 'CC', level: 88 },
 
   // Security
   { name: 'Web Security', category: 'Security', abbr: 'SC', level: 85 },

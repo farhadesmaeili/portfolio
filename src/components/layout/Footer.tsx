@@ -49,7 +49,15 @@ export function Footer(): ReactElement {
           <span className="text-muted/50 ml-2 hidden sm:inline">{'// all rights reserved'}</span>
         </p>
 
-        <div className="order-1 flex items-center gap-5 sm:order-2">
+        <Link
+          href="/games"
+          className="text-muted/35 hover:text-accent/70 order-3 font-mono text-[10px] tracking-widest transition-colors duration-300 sm:order-2"
+          aria-label="Games"
+        >
+          {'// games'}
+        </Link>
+
+        <div className="order-1 flex items-center gap-5 sm:order-3">
           {socialLinks.map((link) => {
             const icon = iconMap[link.icon];
             if (!icon) return null;
