@@ -140,8 +140,8 @@
       const overlayTitle = document.getElementById('overlay-title');
       const overlaySub = document.getElementById('overlay-sub');
 
-      const ALIEN_COLS = 8;
-      const ALIEN_ROWS = 4;
+      const ALIEN_COLS = 7;
+      const ALIEN_ROWS = 3;
       const BULLET_W = 2;
 
       function calcSize() {
@@ -181,8 +181,8 @@
         playerY: H * 0.88,
         bulletSpeed: H * 0.014,
         alienBulletSpeed: H * 0.007,
-        alienStep: W * 0.016,
-        alienDropY: H * 0.038,
+        alienStep: W * 0.02,
+        alienDropY: H * 0.026,
       });
 
       // ── Init ──────────────────────────────────────────────────────────────────
@@ -203,13 +203,18 @@
         playerBullets = [];
         alienBullets = [];
 
-        const alienW = W / (ALIEN_COLS + 2);
-        const alienH = alienW * 0.65;
-        const gapX = alienW * 0.5;
-        const gapY = alienH * 0.65;
+        // Fit the whole grid inside the canvas with a margin on each side so
+        // the edge columns stay on-screen and reachable by the player.
+        const marginX = W * 0.06;
+        const usableW = W - marginX * 2;
+        const gapRatio = 0.4; // gap = 40% of an alien width
+        const alienW = usableW / (ALIEN_COLS + (ALIEN_COLS - 1) * gapRatio);
+        const gapX = alienW * gapRatio;
+        const alienH = alienW * 0.7;
+        const gapY = alienH * 0.55;
         const gridW = ALIEN_COLS * alienW + (ALIEN_COLS - 1) * gapX;
         const startX = (W - gridW) / 2;
-        const startY = H * 0.06;
+        const startY = H * 0.05;
 
         aliens = [];
         for (let r = 0; r < ALIEN_ROWS; r++) {
@@ -228,7 +233,7 @@
 
         alienDir = 1;
         alienMoveTimer = 0;
-        alienMoveInterval = Math.max(8, 38 - wave * 3);
+        alienMoveInterval = Math.max(9, 44 - wave * 3);
         updateHUD();
       }
 
@@ -371,8 +376,11 @@
             if (a.y + a.h >= player.y) return endGame('BREACH', 'THE INVADERS HAVE LANDED');
           }
 
-          // Speed up as fewer aliens remain
-          alienMoveInterval = Math.max(4, Math.round((38 - wave * 3) * (alive.length / (ALIEN_COLS * ALIEN_ROWS))));
+          // Speed up as fewer aliens remain (never faster than 6 frames/move)
+          alienMoveInterval = Math.max(
+            6,
+            Math.round((44 - wave * 3) * (0.4 + 0.6 * (alive.length / (ALIEN_COLS * ALIEN_ROWS)))),
+          );
         }
 
         // Alien random shooting
